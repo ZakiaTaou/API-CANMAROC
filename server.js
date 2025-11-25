@@ -7,7 +7,7 @@ import "./src/models/Player.js";
 import "./src/models/Match.js";
 
 const app = express();
-const port = 3030;
+const port = 5000;
 app.use(express.json());
 
 sequelize
