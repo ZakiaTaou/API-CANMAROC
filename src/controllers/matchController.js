@@ -1,9 +1,9 @@
-const Match = require('../models/Match');
-const Team = require('../models/Team');
-const { Op } = require('sequelize');
+import Match from '../models/Match.js';
+import Team from '../models/Team.js';
+import { Op } from 'sequelize';
 
 // GET /api/matches - Liste tous les matches
-exports.getAllMatches = async (req, res) => {
+const getAllMatches = async (req, res) => {
   try {
     const matches = await Match.findAll({
       include: [
@@ -36,17 +36,13 @@ exports.getAllMatches = async (req, res) => {
 };
 
 // GET /api/matches/upcoming - Matches à venir
-exports.getUpcomingMatches = async (req, res) => {
+const getUpcomingMatches = async (req, res) => {
   try {
     const now = new Date();
     const matches = await Match.findAll({
       where: {
-        match_date: {
-          [Op.gte]: now
-        },
-        status: {
-          [Op.in]: ['scheduled', 'live']
-        }
+        match_date: { [Op.gte]: now },
+        status: { [Op.in]: ['scheduled', 'live'] }
       },
       include: [
         {
@@ -79,7 +75,7 @@ exports.getUpcomingMatches = async (req, res) => {
 };
 
 // GET /api/matches/:id - Détails d'un match
-exports.getMatchById = async (req, res) => {
+const getMatchById = async (req, res) => {
   try {
     const match = await Match.findByPk(req.params.id, {
       include: [
@@ -117,11 +113,10 @@ exports.getMatchById = async (req, res) => {
 };
 
 // POST /api/matches - Créer un match (Admin uniquement)
-exports.createMatch = async (req, res) => {
+const createMatch = async (req, res) => {
   try {
     const { teamHomeId, teamAwayId, matchDate, stadium, status } = req.body;
 
-    // Validation
     if (!teamHomeId || !teamAwayId || !matchDate || !stadium) {
       return res.status(400).json({
         success: false,
@@ -129,7 +124,6 @@ exports.createMatch = async (req, res) => {
       });
     }
 
-    // Vérifier que les équipes sont différentes
     if (teamHomeId === teamAwayId) {
       return res.status(400).json({
         success: false,
@@ -137,14 +131,13 @@ exports.createMatch = async (req, res) => {
       });
     }
 
-    // Vérifier que les équipes existent
     const homeTeam = await Team.findByPk(teamHomeId);
     const awayTeam = await Team.findByPk(teamAwayId);
 
     if (!homeTeam || !awayTeam) {
       return res.status(404).json({
         success: false,
-        message: 'Une ou plusieurs équipes n\'existent pas'
+        message: "Une ou plusieurs équipes n'existent pas"
       });
     }
 
@@ -156,7 +149,6 @@ exports.createMatch = async (req, res) => {
       status: status || 'scheduled'
     });
 
-    // Récupérer le match avec les relations
     const createdMatch = await Match.findByPk(match.id, {
       include: [
         { model: Team, as: 'homeTeam' },
@@ -179,7 +171,7 @@ exports.createMatch = async (req, res) => {
 };
 
 // PUT /api/matches/:id - Modifier un match (Admin uniquement)
-exports.updateMatch = async (req, res) => {
+const updateMatch = async (req, res) => {
   try {
     const match = await Match.findByPk(req.params.id);
 
@@ -190,9 +182,16 @@ exports.updateMatch = async (req, res) => {
       });
     }
 
-    const { teamHomeId, teamAwayId, scoreHome, scoreAway, matchDate, stadium, status } = req.body;
+    const {
+      teamHomeId,
+      teamAwayId,
+      scoreHome,
+      scoreAway,
+      matchDate,
+      stadium,
+      status
+    } = req.body;
 
-    // Vérifier que les équipes sont différentes si elles sont modifiées
     if (teamHomeId && teamAwayId && teamHomeId === teamAwayId) {
       return res.status(400).json({
         success: false,
@@ -200,18 +199,16 @@ exports.updateMatch = async (req, res) => {
       });
     }
 
-    // Mettre à jour le match
     await match.update({
       teamHomeId: teamHomeId || match.teamHomeId,
       teamAwayId: teamAwayId || match.teamAwayId,
-      scoreHome: scoreHome !== undefined ? scoreHome : match.scoreHome,
-      scoreAway: scoreAway !== undefined ? scoreAway : match.scoreAway,
+      scoreHome: scoreHome ?? match.scoreHome,
+      scoreAway: scoreAway ?? match.scoreAway,
       matchDate: matchDate || match.matchDate,
       stadium: stadium || match.stadium,
       status: status || match.status
     });
 
-    // Récupérer le match mis à jour avec les relations
     const updatedMatch = await Match.findByPk(match.id, {
       include: [
         { model: Team, as: 'homeTeam' },
@@ -233,8 +230,8 @@ exports.updateMatch = async (req, res) => {
   }
 };
 
-// DELETE /api/matches/:id - Supprimer un match (Admin uniquement)
-exports.deleteMatch = async (req, res) => {
+// DELETE /api/matches/:id - Supprimer un match
+const deleteMatch = async (req, res) => {
   try {
     const match = await Match.findByPk(req.params.id);
 
@@ -258,4 +255,13 @@ exports.deleteMatch = async (req, res) => {
       error: error.message
     });
   }
+};
+
+export default {
+  getAllMatches,
+  getUpcomingMatches,
+  getMatchById,
+  createMatch,
+  updateMatch,
+  deleteMatch
 };

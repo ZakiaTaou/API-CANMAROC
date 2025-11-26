@@ -1,17 +1,15 @@
-// routes/matchRoutes.js
-const express = require('express');
-const router = express.Router();
-const {
+import express from 'express';
+import {
   getAllMatches,
   getUpcomingMatches,
   getMatchById,
   createMatch,
   updateMatch,
   deleteMatch
-} = require('../controllers/matchController');
+} from '../controllers/matchController';
+import { authenticate, isAdmin } from '../middlewares/auth'
 
-// Importer les middlewares d'authentification (fournis par Dev 2)
-const { authenticate, isAdmin } = require('../middlewares/auth');
+const router = express.Router();
 
 // Routes publiques
 router.get('/', getAllMatches);
@@ -23,4 +21,4 @@ router.post('/', authenticate, isAdmin, createMatch);
 router.put('/:id', authenticate, isAdmin, updateMatch);
 router.delete('/:id', authenticate, isAdmin, deleteMatch);
 
-module.exports = router;
+export default router;
