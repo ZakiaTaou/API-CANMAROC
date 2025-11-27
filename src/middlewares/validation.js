@@ -1,4 +1,4 @@
-const { body } = require('express-validator');
+import { body } from 'express-validator';
 
 // ==============================
 // VALIDATIONS TEAMS
@@ -95,8 +95,7 @@ const validateMatch = [
     .optional()
     .isInt({ min: 0 }).withMessage('Le score extérieur doit être un nombre positif')
 ];
-
-module.exports = {
+export default {
   validateTeam,
   validatePlayer,
   validateMatch

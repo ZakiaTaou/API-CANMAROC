@@ -1,10 +1,10 @@
-const express = require('express');
+import express from 'express';
+import playerController from '../controllers/playerController.js';
+import { authMiddleware } from '../middlewares/authMiddleware.js';
+import { validatePlayer } from '../middlewares/validation.js';
+
+
 const router = express.Router();
-const playerController = require('../controllers/playerController');
-const authMiddleware = require('../middlewares/authMiddleware');
-const { validatePlayer } = require('../middlewares/validation');
-
-
 
 // GET /api/players - Liste tous les joueurs
 router.get('/', playerController.getAllPlayers);
@@ -40,4 +40,4 @@ router.delete(
   playerController.deletePlayer
 );
 
-module.exports = router;
+export default router;

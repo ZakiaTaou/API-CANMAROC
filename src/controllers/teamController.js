@@ -1,5 +1,6 @@
-const { Team, Player } = require('../models');
-const { validationResult } = require('express-validator');
+
+ import {Team, Player} from '../models';
+ import { validationResult } from 'express-validator';
 
 
 const getAllTeams = async (req, res, next) => {
@@ -173,7 +174,7 @@ const deleteTeam = async (req, res, next) => {
   }
 };
 
-module.exports = {
+export default {
   getAllTeams,
   getTeamById,
   createTeam,

@@ -1,6 +1,6 @@
-const { Match, Team } = require('../models');
-const { validationResult } = require('express-validator');
-const { Op } = require('sequelize');
+import {Match, Team} from '../models';
+import { validationResult } from 'express-validator';
+import { Op } from 'sequelize';
 
 
 const getAllMatches = async (req, res, next) => {
@@ -264,7 +264,7 @@ const deleteMatch = async (req, res, next) => {
   }
 };
 
-module.exports = {
+export default {
   getAllMatches,
   getUpcomingMatches,
   getMatchById,
