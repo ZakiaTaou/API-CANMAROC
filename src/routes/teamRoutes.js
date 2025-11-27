@@ -1,18 +1,17 @@
-const express = require('express');
+
+import express from 'express';
+import teamController from '../controllers/teamController.js';
+import { authMiddleware } from '../middlewares/authMiddleware.js';
+import { validateTeam } from '../middlewares/validation.js';
+
+
 const router = express.Router();
-const teamController = require('../controllers/teamController');
-const authMiddleware = require('../middlewares/authMiddleware');
-const { validateTeam } = require('../middlewares/validation');
-
-
 
 // GET /api/teams - Liste toutes les équipes
 router.get('/', teamController.getAllTeams);
 
 // GET /api/teams/:id - Détails d'une équipe
 router.get('/:id', teamController.getTeamById);
-
-
 
 
 // POST /api/teams - Créer une équipe
@@ -38,4 +37,4 @@ router.delete(
   teamController.deleteTeam
 );
 
-module.exports = router;
+export default router;
