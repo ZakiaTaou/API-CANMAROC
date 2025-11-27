@@ -1,9 +1,9 @@
-import Match from '../models/Match.js';
-import Team from '../models/Team.js';
-import { Op } from 'sequelize';
+const { Match, Team } = require('../models');
+const { validationResult } = require('express-validator');
+const { Op } = require('sequelize');
 
-// GET /api/matches - Liste tous les matches
-const getAllMatches = async (req, res) => {
+
+const getAllMatches = async (req, res, next) => {
   try {
     const matches = await Match.findAll({
       include: [
@@ -27,22 +27,21 @@ const getAllMatches = async (req, res) => {
       data: matches
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Erreur lors de la récupération des matches',
-      error: error.message
-    });
+    next(error);
   }
 };
 
-// GET /api/matches/upcoming - Matches à venir
-const getUpcomingMatches = async (req, res) => {
+
+const getUpcomingMatches = async (req, res, next) => {
   try {
     const now = new Date();
+    
     const matches = await Match.findAll({
       where: {
-        match_date: { [Op.gte]: now },
-        status: { [Op.in]: ['scheduled', 'live'] }
+        match_date: {
+          [Op.gte]: now
+        },
+        status: 'scheduled'
       },
       include: [
         {
@@ -56,8 +55,7 @@ const getUpcomingMatches = async (req, res) => {
           attributes: ['id', 'name', 'country', 'flag_url']
         }
       ],
-      order: [['match_date', 'ASC']],
-      limit: 10
+      order: [['match_date', 'ASC']]
     });
 
     res.status(200).json({
@@ -66,18 +64,16 @@ const getUpcomingMatches = async (req, res) => {
       data: matches
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Erreur lors de la récupération des matches à venir',
-      error: error.message
-    });
+    next(error);
   }
 };
 
-// GET /api/matches/:id - Détails d'un match
-const getMatchById = async (req, res) => {
+
+const getMatchById = async (req, res, next) => {
   try {
-    const match = await Match.findByPk(req.params.id, {
+    const { id } = req.params;
+
+    const match = await Match.findByPk(id, {
       include: [
         {
           model: Team,
@@ -104,77 +100,87 @@ const getMatchById = async (req, res) => {
       data: match
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Erreur lors de la récupération du match',
-      error: error.message
-    });
+    next(error);
   }
 };
 
-// POST /api/matches - Créer un match (Admin uniquement)
-const createMatch = async (req, res) => {
+
+const createMatch = async (req, res, next) => {
   try {
-    const { teamHomeId, teamAwayId, matchDate, stadium, status } = req.body;
-
-    if (!teamHomeId || !teamAwayId || !matchDate || !stadium) {
+    // Vérifier les erreurs de validation
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
       return res.status(400).json({
         success: false,
-        message: 'Tous les champs obligatoires doivent être remplis'
+        errors: errors.array()
       });
     }
 
-    if (teamHomeId === teamAwayId) {
-      return res.status(400).json({
-        success: false,
-        message: 'Une équipe ne peut pas jouer contre elle-même'
-      });
-    }
+    const { teamhomeid, teamawayid, match_date, stadium, status, score_home, score_away } = req.body;
 
-    const homeTeam = await Team.findByPk(teamHomeId);
-    const awayTeam = await Team.findByPk(teamAwayId);
+    // Vérifier que les deux équipes existent
+    const homeTeam = await Team.findByPk(teamhomeid);
+    const awayTeam = await Team.findByPk(teamawayid);
 
-    if (!homeTeam || !awayTeam) {
+    if (!homeTeam) {
       return res.status(404).json({
         success: false,
-        message: "Une ou plusieurs équipes n'existent pas"
+        message: 'Équipe domicile non trouvée'
       });
     }
 
+    if (!awayTeam) {
+      return res.status(404).json({
+        success: false,
+        message: 'Équipe extérieure non trouvée'
+      });
+    }
+
+    // Vérifier que les équipes sont différentes
+    if (teamhomeid === teamawayid) {
+      return res.status(400).json({
+        success: false,
+        message: 'Les deux équipes doivent être différentes'
+      });
+    }
+
+    // Créer le match
     const match = await Match.create({
-      teamHomeId,
-      teamAwayId,
-      matchDate,
+      teamhomeid,
+      teamawayid,
+      match_date,
       stadium,
-      status: status || 'scheduled'
+      status: status || 'scheduled',
+      score_home: score_home || 0,
+      score_away: score_away || 0
     });
 
-    const createdMatch = await Match.findByPk(match.id, {
+    // Recharger avec les équipes
+    await match.reload({
       include: [
-        { model: Team, as: 'homeTeam' },
-        { model: Team, as: 'awayTeam' }
+        { model: Team, as: 'homeTeam', attributes: ['id', 'name', 'country'] },
+        { model: Team, as: 'awayTeam', attributes: ['id', 'name', 'country'] }
       ]
     });
 
     res.status(201).json({
       success: true,
       message: 'Match créé avec succès',
-      data: createdMatch
+      data: match
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Erreur lors de la création du match',
-      error: error.message
-    });
+    next(error);
   }
 };
 
-// PUT /api/matches/:id - Modifier un match (Admin uniquement)
-const updateMatch = async (req, res) => {
-  try {
-    const match = await Match.findByPk(req.params.id);
 
+const updateMatch = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { teamhomeid, teamawayid, match_date, stadium, status, score_home, score_away } = req.body;
+
+    // Vérifier si le match existe
+    const match = await Match.findByPk(id);
     if (!match) {
       return res.status(404).json({
         success: false,
@@ -182,59 +188,63 @@ const updateMatch = async (req, res) => {
       });
     }
 
-    const {
-      teamHomeId,
-      teamAwayId,
-      scoreHome,
-      scoreAway,
-      matchDate,
-      stadium,
-      status
-    } = req.body;
-
-    if (teamHomeId && teamAwayId && teamHomeId === teamAwayId) {
-      return res.status(400).json({
-        success: false,
-        message: 'Une équipe ne peut pas jouer contre elle-même'
-      });
+    // Si les équipes changent, vérifier qu'elles existent et sont différentes
+    if (teamhomeid && teamhomeid !== match.teamhomeid) {
+      const homeTeam = await Team.findByPk(teamhomeid);
+      if (!homeTeam) {
+        return res.status(404).json({
+          success: false,
+          message: 'Équipe domicile non trouvée'
+        });
+      }
     }
 
+    if (teamawayid && teamawayid !== match.teamawayid) {
+      const awayTeam = await Team.findByPk(teamawayid);
+      if (!awayTeam) {
+        return res.status(404).json({
+          success: false,
+          message: 'Équipe extérieure non trouvée'
+        });
+      }
+    }
+
+    // Mettre à jour le match
     await match.update({
-      teamHomeId: teamHomeId || match.teamHomeId,
-      teamAwayId: teamAwayId || match.teamAwayId,
-      scoreHome: scoreHome ?? match.scoreHome,
-      scoreAway: scoreAway ?? match.scoreAway,
-      matchDate: matchDate || match.matchDate,
+      teamhomeid: teamhomeid || match.teamhomeid,
+      teamawayid: teamawayid || match.teamawayid,
+      match_date: match_date || match.match_date,
       stadium: stadium || match.stadium,
-      status: status || match.status
+      status: status || match.status,
+      score_home: score_home !== undefined ? score_home : match.score_home,
+      score_away: score_away !== undefined ? score_away : match.score_away
     });
 
-    const updatedMatch = await Match.findByPk(match.id, {
+    // Recharger avec les équipes
+    await match.reload({
       include: [
-        { model: Team, as: 'homeTeam' },
-        { model: Team, as: 'awayTeam' }
+        { model: Team, as: 'homeTeam', attributes: ['id', 'name', 'country'] },
+        { model: Team, as: 'awayTeam', attributes: ['id', 'name', 'country'] }
       ]
     });
 
     res.status(200).json({
       success: true,
       message: 'Match mis à jour avec succès',
-      data: updatedMatch
+      data: match
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Erreur lors de la mise à jour du match',
-      error: error.message
-    });
+    next(error);
   }
 };
 
-// DELETE /api/matches/:id - Supprimer un match
-const deleteMatch = async (req, res) => {
-  try {
-    const match = await Match.findByPk(req.params.id);
 
+const deleteMatch = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    // Vérifier si le match existe
+    const match = await Match.findByPk(id);
     if (!match) {
       return res.status(404).json({
         success: false,
@@ -242,6 +252,7 @@ const deleteMatch = async (req, res) => {
       });
     }
 
+    // Supprimer le match
     await match.destroy();
 
     res.status(200).json({
@@ -249,15 +260,11 @@ const deleteMatch = async (req, res) => {
       message: 'Match supprimé avec succès'
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Erreur lors de la suppression du match',
-      error: error.message
-    });
+    next(error);
   }
 };
 
-export default {
+module.exports = {
   getAllMatches,
   getUpcomingMatches,
   getMatchById,
