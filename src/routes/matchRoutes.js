@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const express = require('express');
 const router = express.Router();
 const matchController = require('../controllers/matchController');
@@ -41,3 +42,29 @@ router.delete(
 );
 
 module.exports = router;
+=======
+import express from 'express';
+import {
+  getAllMatches,
+  getUpcomingMatches,
+  getMatchById,
+  createMatch,
+  updateMatch,
+  deleteMatch
+} from '../controllers/matchController';
+import { authenticate, isAdmin } from '../middlewares/auth'
+
+const router = express.Router();
+
+// Routes publiques
+router.get('/', getAllMatches);
+router.get('/upcoming', getUpcomingMatches);
+router.get('/:id', getMatchById);
+
+// Routes protégées (Admin uniquement)
+router.post('/', authenticate, isAdmin, createMatch);
+router.put('/:id', authenticate, isAdmin, updateMatch);
+router.delete('/:id', authenticate, isAdmin, deleteMatch);
+
+export default router;
+>>>>>>> 0ebda253ea66264337197e0607dfc35f2b0b753a
