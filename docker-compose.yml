@@ -8,7 +8,7 @@ services:
     environment:
       POSTGRES_DB: canMaroc
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: "Samir2003@++"
+      POSTGRES_PASSWORD: "ZakariSobahi123"
     ports:
       - "5432:5432"
     volumes:
@@ -25,7 +25,7 @@ services:
     environment:
       DB_NAME: canMaroc
       DB_USER: postgres
-      DB_PASSWORD: "Samir2003@++"
+      DB_PASSWORD: "ZakariaSobahi123"
       DB_HOST: db
       PORT: 5000
     volumes:
