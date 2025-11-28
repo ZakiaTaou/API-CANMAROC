@@ -6,7 +6,7 @@ import "./src/models/Team.js";
 import "./src/models/Player.js";
 import "./src/models/Match.js";
 
-import teamRoutes from './src/routes/teamRoutes.js'; 
+
 
 
 import authRoutes from "./src/routes/authRoutes.js";
@@ -23,7 +23,7 @@ sequelize
   .catch((err) => console.log("Error DB:", err));
 
 
-app.use('/api/teams', teamRoutes); 
+
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

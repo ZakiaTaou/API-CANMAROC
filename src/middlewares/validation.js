@@ -3,7 +3,7 @@ import { body } from 'express-validator';
 // ==============================
 // VALIDATIONS TEAMS
 // ==============================
-const validateTeam = [
+ export const validateTeam = [
   body('name')
     .trim()
     .notEmpty().withMessage('Le nom de l\'équipe est requis')
@@ -31,7 +31,7 @@ const validateTeam = [
 // ==============================
 // VALIDATIONS PLAYERS
 // ==============================
-const validatePlayer = [
+export const validatePlayer = [
   body('name')
     .trim()
     .notEmpty().withMessage('Le nom du joueur est requis')
@@ -59,7 +59,7 @@ const validatePlayer = [
 // ==============================
 // VALIDATIONS MATCHES
 // ==============================
-const validateMatch = [
+export const validateMatch = [
   body('teamhomeid')
     .notEmpty().withMessage('L\'équipe domicile est requise')
     .isInt().withMessage('L\'ID doit être un nombre'),
@@ -95,8 +95,3 @@ const validateMatch = [
     .optional()
     .isInt({ min: 0 }).withMessage('Le score extérieur doit être un nombre positif')
 ];
-export default {
-  validateTeam,
-  validatePlayer,
-  validateMatch
-};
