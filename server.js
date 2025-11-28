@@ -8,13 +8,14 @@ import "./src/models/Match.js";
 
 import authRoutes from "./src/routes/authRoutes.js";
 import teamRoutes from "./src/routes/teamRoutes.js";
+import matchRoutes from './src/routes/matchRoutes.js'
 
 const app = express();
 const port = 5000;
 app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/teams", teamRoutes);
-
+app.use('/api/matches', matchRoutes)
 sequelize
   .sync({ alter: true })
   .then(() => console.log("Database synced successfully!"))
