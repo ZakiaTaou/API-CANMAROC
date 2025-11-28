@@ -1,4 +1,5 @@
-import {Team, Player} from '../models';
+import Team from '../models/Team.js';
+import Player from '../models/Player.js';
 import { validationResult } from 'express-validator';
 
 
