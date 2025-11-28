@@ -16,7 +16,7 @@ const port = 5000;
 app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/teams", teamRoutes);
-app.use("/api/matchs", teamRoutes);
+app.use("/api/matchs", matchRoutes);
 
 sequelize
   .sync({ alter: true })
