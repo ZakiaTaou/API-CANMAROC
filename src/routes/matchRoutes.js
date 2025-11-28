@@ -1,4 +1,5 @@
-import express from 'express';
+import express from "express";
+import { authenticateToken } from "../middlewares/authMiddleware.js";
 import {
   getAllMatches,
   getUpcomingMatches,
@@ -11,13 +12,10 @@ import { authenticateToken } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
-
-
-
 // Routes publiques
-router.get('/', getAllMatches);
-router.get('/upcoming', getUpcomingMatches);
-router.get('/:id', getMatchById);
+router.get("/", getAllMatches);
+router.get("/upcoming", getUpcomingMatches);
+router.get("/:id", getMatchById);
 
 // Routes protégées (Admin uniquement)
 router.post('/', authenticateToken, createMatch);
