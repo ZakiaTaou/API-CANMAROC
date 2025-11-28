@@ -1,4 +1,5 @@
-import {Match, Team} from '../models';
+import Match from '../models/Match.js';
+import Team from '../models/Team.js';
 import { validationResult } from 'express-validator';
 import { Op } from 'sequelize';
 
