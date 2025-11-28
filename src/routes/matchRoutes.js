@@ -6,8 +6,8 @@ import {
   createMatch,
   updateMatch,
   deleteMatch
-} from '../controllers/matchController';
-import authMiddleware from '../middlewares/authMiddleware'
+} from '../controllers/matchController.js';
+import { authenticateToken } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
@@ -20,8 +20,8 @@ router.get('/upcoming', getUpcomingMatches);
 router.get('/:id', getMatchById);
 
 // Routes protégées (Admin uniquement)
-router.post('/', authMiddleware, createMatch);
-router.put('/:id', authMiddleware, updateMatch);
-router.delete('/:id', authMiddleware, deleteMatch);
+router.post('/', authenticateToken, createMatch);
+router.put('/:id', authenticateToken, updateMatch);
+router.delete('/:id', authenticateToken, deleteMatch);
 
 export default router;
