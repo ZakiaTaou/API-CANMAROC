@@ -47,12 +47,12 @@ export const getUpcomingMatches = async (req, res, next) => {
       include: [
         {
           model: Team,
-          as: 'homeTeam',
+          as: 'HomeTeam',
           attributes: ['id', 'name', 'country', 'flag_url']
         },
         {
           model: Team,
-          as: 'awayTeam',
+          as: 'AwayTeam',
           attributes: ['id', 'name', 'country', 'flag_url']
         }
       ],
@@ -78,12 +78,12 @@ export const getMatchById = async (req, res, next) => {
       include: [
         {
           model: Team,
-          as: 'homeTeam',
+          as: 'HomeTeam',
           attributes: ['id', 'name', 'country', 'flag_url', 'coach']
         },
         {
           model: Team,
-          as: 'awayTeam',
+          as: 'AwayTeam',
           attributes: ['id', 'name', 'country', 'flag_url', 'coach']
         }
       ]
@@ -159,8 +159,8 @@ export const createMatch = async (req, res, next) => {
     // Recharger avec les équipes
     await match.reload({
       include: [
-        { model: Team, as: 'homeTeam', attributes: ['id', 'name', 'country'] },
-        { model: Team, as: 'awayTeam', attributes: ['id', 'name', 'country'] }
+        { model: Team, as: 'HomeTeam', attributes: ['id', 'name', 'country'] },
+        { model: Team, as: 'AwayTeam', attributes: ['id', 'name', 'country'] }
       ]
     });
 
@@ -224,8 +224,8 @@ export const updateMatch = async (req, res, next) => {
     // Recharger avec les équipes
     await match.reload({
       include: [
-        { model: Team, as: 'homeTeam', attributes: ['id', 'name', 'country'] },
-        { model: Team, as: 'awayTeam', attributes: ['id', 'name', 'country'] }
+        { model: Team, as: 'HomeTeam', attributes: ['id', 'name', 'country'] },
+        { model: Team, as: 'AwayTeam', attributes: ['id', 'name', 'country'] }
       ]
     });
 
