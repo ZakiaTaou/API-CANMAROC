@@ -8,17 +8,17 @@ export const getAllMatches = async (req, res, next) => {
   try {
     const matches = await Match.findAll({
       include: [
-        {
-          model: Team,
-          as: 'homeTeam',
-          attributes: ['id', 'name', 'country', 'flag_url']
-        },
-        {
-          model: Team,
-          as: 'awayTeam',
-          attributes: ['id', 'name', 'country', 'flag_url']
-        }
-      ],
+  {
+    model: Team,
+    as: 'HomeTeam', 
+    attributes: ['id', 'name', 'country', 'flag_url']
+  },
+  {
+    model: Team,
+    as: 'AwayTeam',  
+    attributes: ['id', 'name', 'country', 'flag_url']
+  }
+],
       order: [['match_date', 'ASC']]
     });
 
