@@ -1,40 +1,29 @@
-
 import express from 'express';
-import teamController from '../controllers/teamController.js';
-import { authMiddleware } from '../middlewares/authMiddleware.js';
+import { authenticateToken } from '../middlewares/authMiddleware.js';
 import { validateTeam } from '../middlewares/validation.js';
-
+import {
+  getAllTeams,
+  getTeamById,
+  createTeam,
+  updateTeam,
+  deleteTeam
+} from '../controllers/teamController.js';
 
 const router = express.Router();
 
 // GET /api/teams - Liste toutes les équipes
-router.get('/', teamController.getAllTeams);
+router.get('/', getAllTeams);
 
 // GET /api/teams/:id - Détails d'une équipe
-router.get('/:id', teamController.getTeamById);
+router.get('/:id', getTeamById);
 
+// POST /api/teams - Créer une équipe (protégé)
+router.post('/', authenticateToken, validateTeam, createTeam);
 
-// POST /api/teams - Créer une équipe
-router.post(
-  '/',
-  authMiddleware,
-  validateTeam,
-  teamController.createTeam
-);
+// PUT /api/teams/:id - Modifier une équipe (protégé)
+router.put('/:id', authenticateToken, validateTeam, updateTeam);
 
-// PUT /api/teams/:id - Modifier une équipe
-router.put(
-  '/:id',
-  authMiddleware,
-  validateTeam,
-  teamController.updateTeam
-);
-
-// DELETE /api/teams/:id - Supprimer une équipe
-router.delete(
-  '/:id',
-  authMiddleware,
-  teamController.deleteTeam
-);
+// DELETE /api/teams/:id - Supprimer une équipe (protégé)
+router.delete('/:id', authenticateToken, deleteTeam);
 
 export default router;
