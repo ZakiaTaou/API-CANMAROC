@@ -1,9 +1,8 @@
+import Team from '../models/Team.js';
+import Player from '../models/Player.js';
+import { validationResult } from 'express-validator';
 
- import {Team, Player} from '../models';
- import { validationResult } from 'express-validator';
-
-
-const getAllTeams = async (req, res, next) => {
+export const getAllTeams = async (req, res, next) => {
   try {
     const teams = await Team.findAll({
       include: [{
@@ -13,7 +12,6 @@ const getAllTeams = async (req, res, next) => {
       }],
       order: [['name', 'ASC']]
     });
-
     res.status(200).json({
       success: true,
       count: teams.length,
@@ -24,13 +22,9 @@ const getAllTeams = async (req, res, next) => {
   }
 };
 
-// ==============================
-// GET /api/teams/:id - Détails d'une équipe
-// ==============================
-const getTeamById = async (req, res, next) => {
+export const getTeamById = async (req, res, next) => {
   try {
     const { id } = req.params;
-
     const team = await Team.findByPk(id, {
       include: [{
         model: Player,
@@ -38,14 +32,12 @@ const getTeamById = async (req, res, next) => {
         attributes: ['id', 'name', 'position', 'number', 'age']
       }]
     });
-
     if (!team) {
       return res.status(404).json({
         success: false,
         message: 'Équipe non trouvée'
       });
     }
-
     res.status(200).json({
       success: true,
       data: team
@@ -55,12 +47,8 @@ const getTeamById = async (req, res, next) => {
   }
 };
 
-// ==============================
-// POST /api/teams - Créer une équipe (ADMIN ONLY)
-// ==============================
-const createTeam = async (req, res, next) => {
+export const createTeam = async (req, res, next) => {
   try {
-    // Vérifier les erreurs de validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
@@ -68,10 +56,7 @@ const createTeam = async (req, res, next) => {
         errors: errors.array()
       });
     }
-
     const { name, country, flag_url, coach, group } = req.body;
-
-    // Vérifier si l'équipe existe déjà
     const existingTeam = await Team.findOne({ where: { name } });
     if (existingTeam) {
       return res.status(400).json({
@@ -79,8 +64,6 @@ const createTeam = async (req, res, next) => {
         message: 'Une équipe avec ce nom existe déjà'
       });
     }
-
-    // Créer l'équipe
     const team = await Team.create({
       name,
       country,
@@ -88,7 +71,6 @@ const createTeam = async (req, res, next) => {
       coach,
       group
     });
-
     res.status(201).json({
       success: true,
       message: 'Équipe créée avec succès',
@@ -99,15 +81,10 @@ const createTeam = async (req, res, next) => {
   }
 };
 
-// ==============================
-// PUT /api/teams/:id - Modifier une équipe (ADMIN ONLY)
-// ==============================
-const updateTeam = async (req, res, next) => {
+export const updateTeam = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { name, country, flag_url, coach, group } = req.body;
-
-    // Vérifier si l'équipe existe
     const team = await Team.findByPk(id);
     if (!team) {
       return res.status(404).json({
@@ -115,8 +92,6 @@ const updateTeam = async (req, res, next) => {
         message: 'Équipe non trouvée'
       });
     }
-
-    // Si le nom change, vérifier qu'il n'existe pas déjà
     if (name && name !== team.name) {
       const existingTeam = await Team.findOne({ where: { name } });
       if (existingTeam) {
@@ -126,8 +101,6 @@ const updateTeam = async (req, res, next) => {
         });
       }
     }
-
-    // Mettre à jour l'équipe
     await team.update({
       name: name || team.name,
       country: country || team.country,
@@ -135,7 +108,6 @@ const updateTeam = async (req, res, next) => {
       coach: coach || team.coach,
       group: group || team.group
     });
-
     res.status(200).json({
       success: true,
       message: 'Équipe mise à jour avec succès',
@@ -146,14 +118,9 @@ const updateTeam = async (req, res, next) => {
   }
 };
 
-// ==============================
-// DELETE /api/teams/:id - Supprimer une équipe (ADMIN ONLY)
-// ==============================
-const deleteTeam = async (req, res, next) => {
+export const deleteTeam = async (req, res, next) => {
   try {
     const { id } = req.params;
-
-    // Vérifier si l'équipe existe
     const team = await Team.findByPk(id);
     if (!team) {
       return res.status(404).json({
@@ -161,10 +128,7 @@ const deleteTeam = async (req, res, next) => {
         message: 'Équipe non trouvée'
       });
     }
-
-    // Supprimer l'équipe (les joueurs seront supprimés en cascade si configuré)
     await team.destroy();
-
     res.status(200).json({
       success: true,
       message: 'Équipe supprimée avec succès'
@@ -172,12 +136,4 @@ const deleteTeam = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-};
-
-export default {
-  getAllTeams,
-  getTeamById,
-  createTeam,
-  updateTeam,
-  deleteTeam
 };
