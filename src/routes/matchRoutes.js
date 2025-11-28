@@ -8,7 +8,7 @@ import {
   updateMatch,
   deleteMatch
 } from '../controllers/matchController.js';
-import { authenticateToken } from '../middlewares/authMiddleware.js';
+
 
 const router = express.Router();
 
