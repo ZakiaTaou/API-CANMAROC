@@ -41,7 +41,8 @@ const Player = sequelize.define(
   }
 );
 
-Player.belongsTo(Team, { foreignKey: "team_id" });
-Team.hasMany(Player, { foreignKey: "team_id" });
+// Player.js
+Player.belongsTo(Team, { as: "team", foreignKey: "team_id" });
+Team.hasMany(Player, { as: "players", foreignKey: "team_id" });
 
 export default Player;

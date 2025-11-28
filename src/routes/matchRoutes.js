@@ -1,27 +1,24 @@
-import express from 'express';
+import express from "express";
+import { authenticateToken } from "../middlewares/authMiddleware.js";
 import {
   getAllMatches,
   getUpcomingMatches,
   getMatchById,
   createMatch,
   updateMatch,
-  deleteMatch
-} from '../controllers/matchController';
-import authMiddleware from '../middlewares/authMiddleware'
+  deleteMatch,
+} from "../controllers/matchController";
 
 const router = express.Router();
 
-
-
-
 // Routes publiques
-router.get('/', getAllMatches);
-router.get('/upcoming', getUpcomingMatches);
-router.get('/:id', getMatchById);
+router.get("/", getAllMatches);
+router.get("/upcoming", getUpcomingMatches);
+router.get("/:id", getMatchById);
 
 // Routes protégées (Admin uniquement)
-router.post('/', authMiddleware, createMatch);
-router.put('/:id', authMiddleware, updateMatch);
-router.delete('/:id', authMiddleware, deleteMatch);
+router.post("/", authenticateToken, createMatch);
+router.put("/:id", authenticateToken, updateMatch);
+router.delete("/:id", authenticateToken, deleteMatch);
 
 export default router;
