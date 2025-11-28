@@ -6,9 +6,6 @@ import "./src/models/Team.js";
 import "./src/models/Player.js";
 import "./src/models/Match.js";
 
-
-
-
 import authRoutes from "./src/routes/authRoutes.js";
 import teamRoutes from "./src/routes/teamRoutes.js";
 import matchRoutes from "./src/routes/matchRoutes.js";
@@ -25,9 +22,6 @@ sequelize
   .sync({ alter: true })
   .then(() => console.log("Database synced successfully!"))
   .catch((err) => console.log("Error DB:", err));
-
-
-
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
