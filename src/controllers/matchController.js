@@ -4,7 +4,7 @@ import { validationResult } from 'express-validator';
 import { Op } from 'sequelize';
 
 
-const getAllMatches = async (req, res, next) => {
+export const getAllMatches = async (req, res, next) => {
   try {
     const matches = await Match.findAll({
       include: [
@@ -33,7 +33,7 @@ const getAllMatches = async (req, res, next) => {
 };
 
 
-const getUpcomingMatches = async (req, res, next) => {
+export const getUpcomingMatches = async (req, res, next) => {
   try {
     const now = new Date();
     
@@ -70,7 +70,7 @@ const getUpcomingMatches = async (req, res, next) => {
 };
 
 
-const getMatchById = async (req, res, next) => {
+export const getMatchById = async (req, res, next) => {
   try {
     const { id } = req.params;
 
@@ -106,7 +106,7 @@ const getMatchById = async (req, res, next) => {
 };
 
 
-const createMatch = async (req, res, next) => {
+export const createMatch = async (req, res, next) => {
   try {
     // Vérifier les erreurs de validation
     const errors = validationResult(req);
@@ -175,7 +175,7 @@ const createMatch = async (req, res, next) => {
 };
 
 
-const updateMatch = async (req, res, next) => {
+export const updateMatch = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { teamhomeid, teamawayid, match_date, stadium, status, score_home, score_away } = req.body;
@@ -240,7 +240,7 @@ const updateMatch = async (req, res, next) => {
 };
 
 
-const deleteMatch = async (req, res, next) => {
+export const deleteMatch = async (req, res, next) => {
   try {
     const { id } = req.params;
 
@@ -265,11 +265,3 @@ const deleteMatch = async (req, res, next) => {
   }
 };
 
-export default {
-  getAllMatches,
-  getUpcomingMatches,
-  getMatchById,
-  createMatch,
-  updateMatch,
-  deleteMatch
-};
