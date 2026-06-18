@@ -14,7 +14,7 @@ const router = express.Router();
 // GET /api/teams - Liste toutes les équipes
 router.get('/', getAllTeams);
 
-// GET /api/teams/:id - Détails d'une équipe
+// GET /api/teams/:id - Détails d'unequipe
 router.get('/:id', getTeamById);
 
 // POST /api/teams - Créer une équipe (protégé)
