@@ -13,8 +13,6 @@ import playerRoutes from "./src/routes/playerRoutes.js";
 
 import matchRoutes from "./src/routes/matchRoutes.js";
 
-
-
 const app = express();
 const port = 5000;
 app.use(express.json());
@@ -25,7 +23,6 @@ app.use("/api/players", playerRoutes);
 
 app.use("/api/matchs", matchRoutes);
 
-
 sequelize
   .sync({ alter: true })
   .then(() => console.log("Database synced successfully!"))
@@ -34,3 +31,13 @@ sequelize
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
+
+// {
+//     "teamhomeid":2,
+//     "teamawayid":1,
+//     "match_date":"19-8-206",
+//     "stadium": "arena ",
+//     "status":"schedled",
+//     "score_home": 2,
+//     "score_away": 3
+// }

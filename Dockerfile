@@ -1,17 +1,12 @@
-FROM node:18
+FROM node:20-alpine
 
-# Crée un dossier dans le container
 WORKDIR /app
 
-# Copie les fichiers de dépendances
-COPY package*.json ./
-RUN npm install
+COPY  package*.json ./
 
-# Copie le reste du projet
+RUN npm install 
 COPY . .
 
-# Port sur lequel ton API tourne
 EXPOSE 5000
 
-# Fichier d’entrée de ton backend
-CMD ["node", "src/server.js"]
+CMD ["npm", "start"]  

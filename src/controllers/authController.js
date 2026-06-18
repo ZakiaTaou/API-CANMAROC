@@ -33,7 +33,7 @@ const register = async (req, res, next) => {
     if (existingUser) {
       throw new AppError(
         "Cet email ou nom d'utilisateur est déjà utilisé",
-        409
+        409,
       );
     }
 
