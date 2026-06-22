@@ -22,7 +22,14 @@ app.use("/api/teams", teamRoutes);
 app.use("/api/players", playerRoutes);
 
 app.use("/api/matchs", matchRoutes);
-
+app.get("/api/health", (req, res) => {
+  return res.status(200).json({
+    success: true,
+    status: "ok",
+    service: "api-canmaroc",
+    timestamp: new Date().toISOString(),
+  });
+});
 sequelize
   .sync({ alter: true })
   .then(() => console.log("Database synced successfully!"))
