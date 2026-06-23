@@ -30,6 +30,8 @@ app.get("/api/health", (req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+app.get("/", (req, res) => res.send("<h1>hello wolrd cup !</h1>"));
+
 sequelize
   .sync({ alter: true })
   .then(() => console.log("Database synced successfully!"))
